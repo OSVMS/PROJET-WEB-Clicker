@@ -1,5 +1,5 @@
 <?php
-$projectName = 'Prototype Clicker Voiture';
+$projectName = 'Racing Clicker';
 $today = date('d/m/Y');
 $cssVersion = file_exists(__DIR__ . '/style.css') ? (string) filemtime(__DIR__ . '/style.css') : '1';
 $jsVersion = file_exists(__DIR__ . '/script.js') ? (string) filemtime(__DIR__ . '/script.js') : '1';
@@ -16,16 +16,15 @@ $jsVersion = file_exists(__DIR__ . '/script.js') ? (string) filemtime(__DIR__ . 
   <main class="app">
     <header class="topbar">
       <h1><?php echo htmlspecialchars($projectName, ENT_QUOTES, 'UTF-8'); ?></h1>
-      <p>Demo du <?php echo htmlspecialchars($today, ENT_QUOTES, 'UTF-8'); ?></p>
     </header>
 
     <section class="hud">
-      <button id="addFuelBtn" type="button">+1s carburant</button>
+      <button id="addFuelBtn" type="button">+ Carburant</button>
       <div class="stat">
-        Carburant: <strong id="fuelValue">0.0</strong>s
+        Carburant: <strong id="fuelValue">0.0</strong>L
       </div>
       <div class="stat">
-        Reserve max: <strong id="fuelCapValue">5.0</strong>s
+        Reserve max: <strong id="fuelCapValue">5.0</strong>L
       </div>
       <div class="stat">
         Tours: <strong id="lapsValue">0</strong>
@@ -42,12 +41,6 @@ $jsVersion = file_exists(__DIR__ . '/script.js') ? (string) filemtime(__DIR__ . 
 
       <aside class="shop">
         <h2>Boutique d'amelioration</h2>
-        <div class="save-tools">
-          <button id="exportSaveBtn" type="button">Exporter sauvegarde (.json)</button>
-          <button id="importSaveBtn" type="button">Importer sauvegarde</button>
-          <input id="importSaveInput" type="file" accept="application/json,.json" hidden>
-          <p id="saveStatus" class="save-status" aria-live="polite"></p>
-        </div>
         <div class="tabs" role="tablist" aria-label="Onglets boutique">
           <button id="tabVoiture" class="tab is-active" type="button" data-tab="voiture" role="tab" aria-selected="true">Voiture</button>
           <button id="tabEssence" class="tab" type="button" data-tab="essence" role="tab" aria-selected="false">Essence</button>
@@ -74,10 +67,6 @@ $jsVersion = file_exists(__DIR__ . '/script.js') ? (string) filemtime(__DIR__ . 
             <span>Essence par click</span>
             <small>Niv. <strong id="lvlFuelPerClick">0</strong> - Cout: <strong id="costFuelPerClick">8</strong></small>
           </button>
-          <button id="buyFuelReserve" class="upgrade" type="button">
-            <span>Reserve possible</span>
-            <small>Niv. <strong id="lvlFuelReserve">0</strong> - Cout: <strong id="costFuelReserve">14</strong></small>
-          </button>
           <button id="buyConsumptionTime" class="upgrade" type="button">
             <span>Temps de consomation</span>
             <small>Niv. <strong id="lvlConsumptionTime">0</strong> - Cout: <strong id="costConsumptionTime">16</strong></small>
@@ -89,8 +78,22 @@ $jsVersion = file_exists(__DIR__ . '/script.js') ? (string) filemtime(__DIR__ . 
             <span>Ajout d'une autre ligne d'arrive</span>
             <small>Niv. <strong id="lvlFinishLine">0</strong> - Cout: <strong id="costFinishLine">35</strong></small>
           </button>
+          <button id="buyLineGold" class="upgrade" type="button">
+            <span>Or gagne par ligne</span>
+            <small>Niv. <strong id="lvlLineGold">0</strong> - Cout: <strong id="costLineGold">30</strong></small>
+          </button>
         </div>
       </aside>
+
+        <section class="save-panel">
+          <h2>Sauvegarde</h2>
+          <div class="save-tools">
+            <button id="exportSaveBtn" type="button">Exporter sauvegarde (.json)</button>
+            <button id="importSaveBtn" type="button">Importer sauvegarde</button>
+            <input id="importSaveInput" type="file" accept="application/json,.json" hidden>
+            <p id="saveStatus" class="save-status" aria-live="polite"></p>
+          </div>
+        </section>
     </section>
   </main>
 

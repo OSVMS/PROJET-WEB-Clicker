@@ -24,6 +24,7 @@ let fuel = 0;
 let coins = 0;
 let laps = 0;
 let t = 0;
+const carColors = [];
 
 // ============================================================
 // État du jeu — Niveaux des améliorations
@@ -33,9 +34,9 @@ const state = {
   carTankLevel: 0,
   addCarLevel: 0,
   fuelPerClickLevel: 0,
-  fuelReserveLevel: 0,
   consumptionTimeLevel: 0,
   finishLineLevel: 0,
+  lineGoldLevel: 0,
 };
 
 // ============================================================
@@ -74,14 +75,6 @@ const upgradeDefs = {
     costEl: document.getElementById('costFuelPerClick'),
     buttonEl: document.getElementById('buyFuelPerClick'),
   },
-  fuelReserve: {
-    levelKey: 'fuelReserveLevel',
-    costBase: 14,
-    costFactor: 1.65,
-    levelEl: document.getElementById('lvlFuelReserve'),
-    costEl: document.getElementById('costFuelReserve'),
-    buttonEl: document.getElementById('buyFuelReserve'),
-  },
   consumptionTime: {
     levelKey: 'consumptionTimeLevel',
     costBase: 16,
@@ -98,6 +91,20 @@ const upgradeDefs = {
     costEl: document.getElementById('costFinishLine'),
     buttonEl: document.getElementById('buyFinishLine'),
   },
+  lineGold: {
+    levelKey: 'lineGoldLevel',
+    costBase: 30,
+    costFactor: 1.8,
+    levelEl: document.getElementById('lvlLineGold'),
+    costEl: document.getElementById('costLineGold'),
+    buttonEl: document.getElementById('buyLineGold'),
+  },
+};
+
+const upgradesByCategory = {
+  voiture: ['carSpeed', 'addCar'],
+  essence: ['fuelPerClick', 'carTank', 'consumptionTime'],
+  circuit: ['finishLine', 'lineGold'],
 };
 
 // ============================================================
@@ -115,7 +122,7 @@ function getUpgradeCost(def) {
 }
 
 function getFuelCap() {
-  return 5 + state.fuelReserveLevel * 3 + state.carTankLevel * 2;
+  return 5 + state.carTankLevel * 3;
 }
 
 function getFuelPerClick() {
@@ -138,6 +145,10 @@ function getConsumptionPerSecond() {
 
 function getFinishLineCount() {
   return 1 + state.finishLineLevel;
+}
+
+function getCoinsPerLine() {
+  return 1 + state.lineGoldLevel;
 }
 
 // ============================================================
@@ -229,12 +240,25 @@ function drawFinishLines() {
   ctx.restore();
 }
 
-function drawCar(point, angle, hueShift) {
+function generateRandomCarColor() {
+  const hue = Math.floor(Math.random() * 360);
+  const saturation = 55 + Math.floor(Math.random() * 25);
+  const lightness = 28 + Math.floor(Math.random() * 18);
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+}
+
+function ensureCarColors(count) {
+  while (carColors.length < count) {
+    carColors.push(generateRandomCarColor());
+  }
+}
+
+function drawCar(point, angle, bodyColor) {
   ctx.save();
   ctx.translate(point.x, point.y);
   ctx.rotate(angle);
 
-  ctx.fillStyle = `hsl(${160 + hueShift}, 65%, 28%)`;
+  ctx.fillStyle = bodyColor;
   ctx.fillRect(-13, -8, 26, 16);
 
   ctx.fillStyle = '#f59e0b';
@@ -304,6 +328,19 @@ function setActiveTab(tabName) {
   tabPanels.forEach((panel) => {
     const isActive = panel.dataset.panel === tabName;
     panel.classList.toggle('is-active', isActive);
+  });
+}
+
+function organizeUpgradesByCategory() {
+  Object.entries(upgradesByCategory).forEach(([category, upgradeKeys]) => {
+    const panel = tabPanels.find((item) => item.dataset.panel === category);
+    if (!panel) return;
+
+    upgradeKeys.forEach((key) => {
+      const def = upgradeDefs[key];
+      if (!def || !def.buttonEl) return;
+      panel.appendChild(def.buttonEl);
+    });
   });
 }
 
@@ -410,18 +447,20 @@ function loop(timestamp) {
 
   if (crossedCount > 0) {
     laps += crossedCount;
-    coins += crossedCount * getFinishLineCount();
+    coins += crossedCount * getFinishLineCount() * getCoinsPerLine();
     updateShopUi();
   }
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawTrack();
 
+  ensureCarColors(cars);
+
   for (let i = 0; i < cars; i += 1) {
     const carT = (t + i * phaseStep) % (Math.PI * 2);
     const carPos = lemniscatePoint(carT);
     const heading = getHeading(carT);
-    drawCar(carPos, heading, i * 28);
+    drawCar(carPos, heading, carColors[i]);
   }
 
   updateHud();
@@ -460,13 +499,15 @@ upgradeDefs.carSpeed.buttonEl.addEventListener('click', () => buyUpgrade('carSpe
 upgradeDefs.carTank.buttonEl.addEventListener('click', () => buyUpgrade('carTank'));
 upgradeDefs.addCar.buttonEl.addEventListener('click', () => buyUpgrade('addCar'));
 upgradeDefs.fuelPerClick.buttonEl.addEventListener('click', () => buyUpgrade('fuelPerClick'));
-upgradeDefs.fuelReserve.buttonEl.addEventListener('click', () => buyUpgrade('fuelReserve'));
 upgradeDefs.consumptionTime.buttonEl.addEventListener('click', () => buyUpgrade('consumptionTime'));
 upgradeDefs.finishLine.buttonEl.addEventListener('click', () => buyUpgrade('finishLine'));
+upgradeDefs.lineGold.buttonEl.addEventListener('click', () => buyUpgrade('lineGold'));
 
 // ============================================================
 // Démarrage — Initialisation de l'affichage et lancement du jeu
 // ============================================================
+
 updateHud();
+organizeUpgradesByCategory();
 updateShopUi();
 requestAnimationFrame(loop);
