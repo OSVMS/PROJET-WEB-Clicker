@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "savedAt": "2026-04-03T08:56:20.705Z",
+  "fuel": 3.8189999999999875,
+  "coins": 0,
+  "laps": 0,
+  "t": 5.595899999999994,
+  "activeTab": "voiture",
+  "state": {
+    "carSpeedLevel": 9999,
+    "carTankLevel": 9999,
+    "addCarLevel": 9999,
+    "fuelPerClickLevel": 9999,
+    "fuelReserveLevel": 9999,
+    "consumptionTimeLevel": 9999,
+    "finishLineLevel": 9999
+  }
+}
